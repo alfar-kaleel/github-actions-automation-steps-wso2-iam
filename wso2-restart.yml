@@ -1,0 +1,28 @@
+name: WSO2 Identity Server Restart
+
+on:
+  workflow_dispatch:   # lets you trigger it manually from GitHub Actions tab
+
+jobs:
+  wso2-restart:
+    runs-on: self-hosted   # must be your own runner where WSO2 IS is installed
+    steps:
+      - name: Stop WSO2 Identity Server
+        run: |
+          echo "Stopping WSO2 Identity Server..."
+          pkill -f "org.wso2.carbon.bootstrap.Bootstrap" || echo "No IS process running"
+
+      - name: Update Port in deployment.toml
+        run: |
+          DEPLOYMENT_TOML="$HOME/wso2is-7.1/repository/conf/deployment.toml"
+          echo "Updating offset value..."
+          sed -i 's/^offset *= *[0-9]\+/offset = 1/' "$DEPLOYMENT_TOML"
+          echo "Updated offset line:"
+          grep offset "$DEPLOYMENT_TOML"
+
+      - name: Start WSO2 Identity Server
+        run: |
+          echo "Starting WSO2 Identity Server..."
+          nohup $HOME/wso2is-7.1/bin/wso2server.sh start > $HOME/wso2is.log 2>&1 &
+          sleep 30
+          echo "WSO2 IS started. Logs at $HOME/wso2is.log"
