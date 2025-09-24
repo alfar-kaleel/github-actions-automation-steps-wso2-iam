@@ -1,0 +1,39 @@
+name: Stop WSO2 IAM Server
+
+on:
+
+  workflow_dispatch:
+
+jobs:
+
+  stop-server:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Stop WSO2 IS if running
+
+      uses: appleboy/ssh-action@v0.1.10
+
+      with:
+
+        host: ${{ secrets.SSH_HOST }}
+
+        username: ${{ secrets.SSH_USER }}
+
+        key: ${{ secrets.SSH_KEY }}
+
+        script: |
+
+          if pgrep -f wso2server; then
+
+            echo "Stopping WSO2 IS..."
+
+            pkill -f wso2server
+
+          else
+
+            echo "WSO2 IS is not running."
+
+          fi
