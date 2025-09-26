@@ -1,0 +1,20 @@
+name: Test job
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run workflow'
+        required: true
+        default: 'develop'
+
+jobs:
+  run-on-selected-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v3
+        with: 
+          ref: ${{github.event.inputs.branch}}
+
+      - name: Run a script
+        run: echo "Running job from branch ${{github.event.inputs.branch}}"  
